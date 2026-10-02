@@ -10,18 +10,12 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.12/dist/css/uikit.min.css">
   <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.12/dist/js/uikit.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.12/dist/js/uikit-icons.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.12/dist/js/components/parallax.js"></script>
-
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-
-  <link href="https://fonts.googleapis.com/css?family=Saira+Condensed:800,400&amp;display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:wght@800&amp;display=swap" rel="stylesheet">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="images/favicon.ico">
 
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Martel+Sans:wght@400;800&amp;amp;amp;display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Martel+Sans:wght@400;800&display=swap");
 
     body {
       background-color: white;
@@ -196,6 +190,103 @@
     .uk-overflow-autoX::-webkit-scrollbar-track {
       background-color: #f1f1f1;
     }
+
+    /* ===== MENU : pilule glissante ===== */
+    .mytab {
+      --apel-rose: rgb(206, 0, 127);
+      position: sticky; top: 0; z-index: 980;
+      isolation: isolate;
+      display: flex; flex-wrap: nowrap; gap: .25rem;
+      margin: 0; padding: .5rem;
+      overflow-x: auto; scrollbar-width: none;
+      box-shadow: 0 8px 22px -14px rgb(0 0 0 / .45);
+    }
+    .mytab::-webkit-scrollbar { display: none; }
+    .mytab > li { padding-left: 0; flex: none; }
+    .mytab > li > a {
+      border-bottom: 0 !important;
+      margin: 0;
+      padding: .55rem 1.05rem; border-radius: 999px;
+      font-size: 1rem !important; line-height: 1.2;
+      text-transform: none; white-space: nowrap;
+      transition: background-color .25s;
+    }
+    .mytab > li:not(.uk-active) > a:hover { background: rgb(255 255 255 / .16); }
+    .mytab > li > a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+    /* la pilule, placée par apelMenuInk() */
+    .mytab::after {
+      content: ""; position: absolute; z-index: -1; left: 0; top: 0;
+      width: var(--ink-w, 0); height: var(--ink-h, 0);
+      translate: var(--ink-x, 0) var(--ink-y, 0);
+      border-radius: 999px; background: var(--apel-rose);
+      box-shadow: 0 6px 16px -6px rgb(120 0 70 / .7);
+    }
+    .mytab.ink-ready::after {
+      transition: translate .5s cubic-bezier(.3, 1.3, .5, 1), width .5s cubic-bezier(.3, 1.3, .5, 1);
+      transition: translate .6s linear(0, 0.22 7%, 0.68 15%, 1.04 25%, 1.13 32%, 1.1 39%, 1.02 50%, 0.99 60%, 1 75%, 1),
+                  width .6s linear(0, 0.22 7%, 0.68 15%, 1.04 25%, 1.13 32%, 1.1 39%, 1.02 50%, 0.99 60%, 1 75%, 1);
+    }
+    @media (prefers-reduced-motion: reduce) { .mytab.ink-ready::after { transition: none; } }
+
+    /* ===== MENU MOBILE (offcanvas) ===== */
+    .mytab > .uk-navbar-toggle,
+    .mytab > .uk-navbar-toggle * { color: #fff !important; }
+    .mytab > .uk-navbar-toggle { order: -1; margin: 0; padding: .25rem .75rem; min-height: 0; border-bottom: 0 !important; }
+    #offcanvas-nav .uk-offcanvas-bar {
+      background: linear-gradient(165deg, rgb(29, 179, 174), rgb(18, 132, 129)) !important;
+    }
+    /* une seule colonne : UIkit retire uk-tab-right sous 960px, on force la colonne */
+    .mobileMenu {
+      flex-direction: column !important; flex-wrap: nowrap !important;
+      gap: .35rem; margin: 2.5rem 0 0 !important; background: none !important;
+    }
+    .mobileMenu::before { display: none; }
+    .mobileMenu > li { padding-left: 0; }
+    .mobileMenu > li > a {
+      border: 0 !important;
+      margin: 0;
+      justify-content: flex-start;
+      padding: .75rem 1.1rem; border-radius: 999px;
+      font-size: 1.1rem !important; line-height: 1.2; text-transform: none;
+      transition: background-color .2s, translate .2s;
+    }
+    .mobileMenu > li > a:hover { background: rgb(255 255 255 / .15); translate: 4px 0; }
+    .mobileMenu > li.uk-active > a {
+      background: rgb(206, 0, 127);
+      box-shadow: 0 6px 16px -6px rgb(90 0 50 / .7);
+    }
+    /* entrée en cascade à l'ouverture du panneau */
+    #offcanvas-nav.uk-open .mobileMenu > li { animation: apel-slide-in .45s cubic-bezier(.2, .8, .2, 1) both; }
+    #offcanvas-nav.uk-open .mobileMenu > li:nth-child(2) { animation-delay: .04s; }
+    #offcanvas-nav.uk-open .mobileMenu > li:nth-child(3) { animation-delay: .08s; }
+    #offcanvas-nav.uk-open .mobileMenu > li:nth-child(4) { animation-delay: .12s; }
+    #offcanvas-nav.uk-open .mobileMenu > li:nth-child(5) { animation-delay: .16s; }
+    #offcanvas-nav.uk-open .mobileMenu > li:nth-child(6) { animation-delay: .20s; }
+    #offcanvas-nav.uk-open .mobileMenu > li:nth-child(7) { animation-delay: .24s; }
+    #offcanvas-nav.uk-open .mobileMenu > li:nth-child(8) { animation-delay: .28s; }
+    @keyframes apel-slide-in { from { opacity: 0; translate: 24px 0; } }
+    @media (prefers-reduced-motion: reduce) { #offcanvas-nav.uk-open .mobileMenu > li { animation: none; } }
+
+    /* ===== EN-TÊTE : le souffle (graines du pissenlit) ===== */
+    /* le site force body * en noir : les lettres reprennent la couleur du titre */
+    .apel-line, .apel-line * { color: inherit !important; }
+    .apel-word { display: inline-block; white-space: nowrap; }
+    .apel-l, .apel-g { display: inline-block; }
+    .apel-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    header { position: relative; }
+    /* les lettres arrivent portées par le vent, depuis le logo */
+    .apel-g {
+      animation: apel-blow-in 1s cubic-bezier(.2, .7, .2, 1) both;
+      animation-delay: calc((var(--n) - var(--i)) * 40ms);
+    }
+    @keyframes apel-blow-in { from { opacity: 0; translate: .9em -.4em; rotate: 16deg; filter: blur(8px); } }
+    header h1 > br + span { animation: apel-fade-up .9s cubic-bezier(.2, .7, .2, 1) .8s both; }
+    @keyframes apel-fade-up { from { opacity: 0; translate: 0 .4em; } }
+    /* les graines du pissenlit */
+    .apel-seeds { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+    header img[alt="Apel"] { cursor: pointer; transition: scale .25s; }
+    header img[alt="Apel"]:active { scale: .94; }
+    @media (prefers-reduced-motion: reduce) { .apel-g, header h1 > br + span { animation: none; } }
   </style>
 
   <!-- slideshow init removed (targets were in static articles) -->
@@ -1333,6 +1424,148 @@
 
 
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+
+<script>
+  /* MENU : positionne la pilule rose sous l'onglet actif */
+  function apelMenuInk(root) {
+    (root || document).querySelectorAll('.mytab').forEach(function (ul) {
+      function place() {
+        var a = ul.querySelector(':scope > li.uk-active > a');
+        if (!a || !a.offsetWidth) { ul.style.setProperty('--ink-w', '0px'); return; }
+        var r = a.getBoundingClientRect(), p = ul.getBoundingClientRect();
+        var x = r.left - p.left - ul.clientLeft + ul.scrollLeft;
+        var y = r.top - p.top - ul.clientTop + ul.scrollTop;
+        ul.style.setProperty('--ink-x', x + 'px');
+        ul.style.setProperty('--ink-y', y + 'px');
+        ul.style.setProperty('--ink-w', r.width + 'px');
+        ul.style.setProperty('--ink-h', r.height + 'px');
+        // garder l'onglet actif visible quand la barre défile horizontalement
+        if (x < ul.scrollLeft || x + r.width > ul.scrollLeft + ul.clientWidth) {
+          ul.scrollTo({ left: x - 16, behavior: 'smooth' });
+        }
+      }
+      new MutationObserver(place).observe(ul, { subtree: true, attributes: true, attributeFilter: ['class'] });
+      if (window.ResizeObserver) new ResizeObserver(place).observe(ul);
+      if (document.fonts) document.fonts.ready.then(place);
+      place();
+      requestAnimationFrame(function () { ul.classList.add('ink-ready'); });
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function () { apelMenuInk(); });
+</script>
+
+<script>
+  /* EN-TÊTE : le souffle — graines du pissenlit et arrivée des lettres */
+  function apelSplit(root) {
+    var h1 = (root || document).querySelector('header h1');
+    if (!h1 || h1.dataset.split) return h1;
+    h1.dataset.split = '1';
+    var node = [].find.call(h1.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+    if (!node) return h1;
+    var text = node.textContent.trim(), line = document.createElement('span'), i = 0;
+    line.className = 'apel-line';
+    line.innerHTML = '<span class="apel-sr"></span>';
+    line.firstChild.textContent = text;
+    text.split(/\s+/).forEach(function (word, w) {
+      if (w) line.appendChild(document.createTextNode(' '));
+      var ws = document.createElement('span');
+      ws.className = 'apel-word';
+      ws.setAttribute('aria-hidden', 'true');
+      word.split('').forEach(function (ch) {
+        var l = document.createElement('span'), g = document.createElement('span');
+        l.className = 'apel-l'; l.style.setProperty('--i', i++);
+        g.className = 'apel-g'; g.textContent = ch;
+        l.appendChild(g); ws.appendChild(l);
+      });
+      line.appendChild(ws);
+    });
+    line.style.setProperty('--n', i);
+    node.replaceWith(line);
+    return h1;
+  }
+
+  function apelSouffle(root) {
+    root = root || document;
+    apelSplit(root);
+    var header = root.querySelector('header'), logo = header && header.querySelector('img[alt="Apel"]');
+    if (!header || !logo || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var cv = document.createElement('canvas'), ctx = cv.getContext('2d');
+    cv.className = 'apel-seeds'; cv.setAttribute('aria-hidden', 'true');
+    header.appendChild(cv);
+    logo.title = 'Soufflez !';
+    var seeds = [], W = 0, H = 0, mouse = { x: -999, y: -999 }, last = 0, lastSpawn = 0, visible = true;
+    var TEAL = 'rgb(29, 179, 174)', ROSE = 'rgb(206, 0, 127)';
+    function size() {
+      var r = header.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function origin() { // le cœur du pissenlit dans le logo
+      var h = header.getBoundingClientRect(), l = logo.getBoundingClientRect();
+      return { x: l.left - h.left + l.width * 0.64, y: l.top - h.top + l.height * 0.36 };
+    }
+    function spawn(burst) {
+      var o = origin(), a = burst ? Math.PI * (0.75 + Math.random() * 0.6) : 0, v = 60 + Math.random() * 140;
+      seeds.push({
+        x: o.x + (Math.random() - 0.5) * 18, y: o.y + (Math.random() - 0.5) * 18,
+        vx: burst ? Math.cos(a) * v : -12, vy: burst ? Math.sin(a) * v - 30 : -4,
+        wind: -(20 + Math.random() * 28), lift: (Math.random() - 0.65) * 14,
+        r: 5 + Math.random() * 4, rot: (Math.random() - 0.5) * 0.8, vr: (Math.random() - 0.5) * 0.6,
+        ph: Math.random() * 6.3, age: 0, life: 10 + Math.random() * 7,
+        c: Math.random() < 0.17 ? ROSE : TEAL
+      });
+    }
+    function draw(s, alpha) {
+      ctx.save();
+      ctx.translate(s.x, s.y); ctx.rotate(s.rot);
+      ctx.globalAlpha = alpha; ctx.strokeStyle = s.c; ctx.fillStyle = s.c; ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, s.r * 1.4); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(0, s.r * 1.5, 1.1, 2.3, 0, 0, Math.PI * 2); ctx.fill();
+      for (var k = 0; k <= 8; k++) {
+        var t = Math.PI + (k / 8) * Math.PI, ex = Math.cos(t) * s.r, ey = Math.sin(t) * s.r * 0.85;
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(ex * 0.35, ey * 0.75, ex, ey); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    function tick(t) {
+      if (!visible) { last = 0; return; }
+      var dt = last ? Math.min(0.05, (t - last) / 1000) : 0.016;
+      last = t;
+      if (t - lastSpawn > 900 && seeds.length < 22) { spawn(false); lastSpawn = t; }
+      ctx.clearRect(0, 0, W, H);
+      for (var i = seeds.length - 1; i >= 0; i--) {
+        var s = seeds[i], dx = s.x - mouse.x, dy = s.y - mouse.y, d2 = dx * dx + dy * dy;
+        s.age += dt;
+        if (d2 < 9000) { // le curseur souffle sur les graines
+          var d = Math.sqrt(d2) || 1, f = (1 - d2 / 9000) * 320 * dt;
+          s.vx += dx / d * f; s.vy += dy / d * f; s.vr += (Math.random() - 0.5) * 4 * dt;
+        }
+        s.vx += (s.wind - s.vx) * 0.5 * dt;
+        s.vy += (s.lift - s.vy) * 0.5 * dt;
+        s.x += (s.vx + Math.sin(s.age * 1.3 + s.ph) * 9) * dt;
+        s.y += (s.vy + Math.cos(s.age * 1.1 + s.ph) * 7) * dt;
+        s.rot += s.vr * dt;
+        if (s.age > s.life || s.x < -40 || s.y < -40 || s.y > H + 40) { seeds.splice(i, 1); continue; }
+        draw(s, Math.max(0, Math.min(1, s.age / 1.2, (s.life - s.age) / 2.5)) * 0.8);
+      }
+      requestAnimationFrame(tick);
+    }
+    header.addEventListener('pointermove', function (e) {
+      var r = header.getBoundingClientRect();
+      mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
+    });
+    header.addEventListener('pointerleave', function () { mouse.x = mouse.y = -999; });
+    logo.addEventListener('click', function () { for (var k = 0; k < 16; k++) spawn(true); });
+    size();
+    if (window.ResizeObserver) new ResizeObserver(size).observe(header);
+    for (var k = 0; k < 7; k++) { spawn(false); var s = seeds[k]; s.age = 1.5 + k; s.x -= k * 45; s.y += (k % 3 - 1) * 14; }
+    new IntersectionObserver(function (en) {
+      var was = visible; visible = en[0].isIntersecting;
+      if (visible && !was) requestAnimationFrame(tick);
+    }).observe(header);
+    requestAnimationFrame(tick);
+  }
+  document.addEventListener('DOMContentLoaded', function () { apelSouffle(); });
+</script>
 
 </body></html>
